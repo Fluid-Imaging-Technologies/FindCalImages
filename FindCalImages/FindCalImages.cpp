@@ -8,7 +8,7 @@
 
 char default_oldestFileDate[] = "01/01/2011";
 char default_SearchFolder[] = "C:\\TEMP\\TESTFOLDER";
-char default_SaveFolder[] = "C:\\FlowCAM\\Experiments\\Calibration Images";
+char default_SaveFolder[] = "C:\\Time Series Calibration Images";
 
 time_t BeginTime;
 char SearchFolder[MAX_PATH];
@@ -124,13 +124,11 @@ INT_PTR CALLBACK MainDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 			SetDlgItemText(mdialog, IDC_STATUS, "COMPLETE");
 			Sleep(3000);
 
-			EndDialog(hDlg, LOWORD(wParam));
 			exit(0);			
 		}
 
 		if (LOWORD(wParam) == IDCANCEL)
 		{
-			EndDialog(hDlg, 0);
 			exit(0);			
 		}
 	}
@@ -189,12 +187,12 @@ void copyfiles(char *dir, char *dirname)
 		}
 		else if (strncmp(finddata.name, "cal_image", 8) == 0) 
 		{
-			if (finddata.time_write >= BeginTime) 
-			{
-				int image_number = 1;
-				if (strlen(finddata.name) >= 10)
-					image_number = atoi(finddata.name + 10);
+			int image_number = 0;
+			if (strlen(finddata.name) >= 10)
+				image_number = atoi(finddata.name + 10);
 
+			if (finddata.time_write >= BeginTime && image_number == 1) 
+			{
 				struct tm filetime;
 				if (localtime_s(&filetime, &finddata.time_write) == 0)
 				{
@@ -203,15 +201,14 @@ void copyfiles(char *dir, char *dirname)
 					sprintf_s(oldname, sizeof(oldname), "%s\\%s", dir, finddata.name);
 
 					sprintf_s(newname, sizeof(newname), 
-						"%s\\%04d_%02d_%02d_%02d_%02d__%s_%03d.tif", 
+						"%s\\%04d_%02d_%02d_%02d_%02d__%s.tif", 
 						SaveFolder, 
 						filetime.tm_year + 1900,
 						filetime.tm_mon + 1,
 						filetime.tm_mday,
 						filetime.tm_hour,
 						filetime.tm_min,
-						dirname,
-						image_number);
+						dirname);
 					
 					CopyFile(oldname, newname, true);
 
