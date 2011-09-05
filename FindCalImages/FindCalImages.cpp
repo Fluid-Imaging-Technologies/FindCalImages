@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 char default_oldestFileDate[] = "01/01/2011";
-char default_SearchFolder[] = "C:\\TEMP\\TESTFOLDER";
+char default_SearchFolder[] = "C:";
 char default_SaveFolder[] = "C:\\Time Series Calibration Images";
 
 time_t BeginTime;
@@ -210,11 +210,12 @@ void copyfiles(char *dir, char *dirname)
 						filetime.tm_min,
 						dirname);
 					
-					CopyFile(oldname, newname, true);
-
-					char buf[10];
-					sprintf_s(buf, "%d", ++NFilesCopied);
-					SetDlgItemText(mdialog, IDC_COPY_COUNT, buf);
+					if (CopyFile(oldname, newname, false) != 0)
+					{
+						char buf[10];
+						sprintf_s(buf, "%d", ++NFilesCopied);
+						SetDlgItemText(mdialog, IDC_COPY_COUNT, buf);
+					}
 				}
 			}
 		}
